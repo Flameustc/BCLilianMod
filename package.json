@@ -1,0 +1,24 @@
+{
+  "name": "bc-lilian-mod",
+  "displayName": "Lilian's BC Mod",
+  "version": "0.1.0",
+  "description": "Lilian's BC Mod for her lovely subs.",
+  "author": "Lilian",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "build": "rollup -c rollup.config.js"
+  },
+  "dependencies": {
+    "bondage-club-mod-sdk": "^1.2.0"
+  },
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^28.0.2",
+    "@rollup/plugin-node-resolve": "^16.0.0",
+    "@rollup/plugin-typescript": "^12.1.2",
+    "rollup": "^4.29.1",
+    "tslib": "^2.8.1",
+    "typescript": "^5.7.2"
+  },
+  "type": "module"
+}
