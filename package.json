@@ -16,6 +16,7 @@
     "@rollup/plugin-commonjs": "^28.0.2",
     "@rollup/plugin-node-resolve": "^16.0.0",
     "@rollup/plugin-typescript": "^12.1.2",
+    "bc-stubs": "^111.0.0",
     "rollup": "^4.29.1",
     "tslib": "^2.8.1",
     "typescript": "^5.7.2"

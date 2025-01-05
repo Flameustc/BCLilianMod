@@ -1,5 +1,5 @@
 import bcMod from 'bondage-club-mod-sdk'
-import { ModName, ModVersion } from './Definition';
+import { ModName, ModVersion } from './definition';
 
 declare global {
     interface Window {
