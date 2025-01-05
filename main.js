@@ -27,11 +27,88 @@
 	const ModName = 'BCLilianMod';
 	const ModVersion = '0.1.0';
 
+	function garbleChar(c, garbleSound, allowHyphen) {
+	    if (/^\p{N}/u.test(c)) {
+	        return { content: "*", allowHyphen: false };
+	    }
+	    else if (/^\p{Lu}/u.test(c)) {
+	        return { content: "M", allowHyphen: false };
+	    }
+	    else if (/^[\x00-\x7F]*$/.test(c)) {
+	        return { content: "m", allowHyphen: false };
+	    }
+	    else if (allowHyphen && Math.random() < 0.7) {
+	        return { content: "—", allowHyphen: true };
+	    }
+	    else {
+	        return { content: garbleSound[Math.floor(Math.random() * garbleSound.length)], allowHyphen: true };
+	    }
+	}
+	function garbleMessage(msg, gagLevel, garbleSound) {
+	    if (gagLevel <= 0) {
+	        return msg;
+	    }
+	    let inOOC = false;
+	    let allowHyphen = false;
+	    let str = [];
+	    let i = 0;
+	    while (i < msg.length) {
+	        switch (msg[i]) {
+	            case "(":
+	            case "（":
+	                inOOC = true;
+	                allowHyphen = false;
+	                str.push(msg[i++]);
+	                continue;
+	            case ")":
+	            case "）":
+	                inOOC = false;
+	                allowHyphen = false;
+	                str.push(msg[i++]);
+	                continue;
+	        }
+	        if (inOOC || !/^(\p{L}|\p{N})/u.test(msg[i])) {
+	            allowHyphen = false;
+	            str.push(msg[i++]);
+	            continue;
+	        }
+	        if (Math.random() * 30 > gagLevel + 6) {
+	            allowHyphen = false;
+	            str.push(msg[i++]);
+	            continue;
+	        }
+	        else {
+	            const res = garbleChar(msg[i], garbleSound, allowHyphen);
+	            str.push(res.content);
+	            allowHyphen = res.allowHyphen;
+	            i++;
+	            continue;
+	        }
+	    }
+	    return str.join("");
+	}
+	function getGarbleSound() {
+	    return ["呜"];
+	}
+
+	class ChatGarbler {
+	    static init(mod) {
+	        mod.hookFunction('ChatRoomGenerateChatRoomChatMessage', 10, (args, next) => {
+	            let [type, originalMsg] = args;
+	            let garbledMsg = garbleMessage(originalMsg, SpeechTransformGagGarbleIntensity(Player), getGarbleSound());
+	            let msgDict = [{ Effects: ["gagGarble"], Original: originalMsg }];
+	            let res = { Content: garbledMsg, Type: type, Dictionary: msgDict };
+	            return res;
+	        });
+	    }
+	}
+
 	(function () {
 	    if (window.BCLilianMod_Loaded)
 	        return;
 	    window.BCLilianMod_Loaded = false;
-	    bcMod.registerMod({ name: ModName, fullName: ModName, version: ModVersion });
+	    const mod = bcMod.registerMod({ name: ModName, fullName: ModName, version: ModVersion });
+	    ChatGarbler.init(mod);
 	    console.log(`${ModName} v${ModVersion} loaded.`);
 	    window.BCLilianMod_Loaded = true;
 	})();
