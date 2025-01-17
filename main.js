@@ -113,7 +113,14 @@
 	function patchSenseDep(mod) {
 	    mod.hookFunction('ChatRoomUpdateDisplay', 10, (args, next) => {
 	        next(args);
-	        if (ChatRoomCharacterViewCharacterCount < 10 && ChatRoomImpactedBySenseDep.some(character => IsLilian(Player, character))) {
+	        if (Player.IsBlind() && ChatRoomCharacterViewCharacterCount < 10 && ChatRoomCharacter.some(C => IsLilian(Player, C))) {
+	            let drawList = ChatRoomCharacterDrawlist.slice();
+	            let impactList = ChatRoomImpactedBySenseDep.slice();
+	            // These two list are not updated when RenderSingle
+	            if (ChatRoomCharacterViewCharacterCount === 1) {
+	                drawList = [Player];
+	                impactList = ChatRoomCharacter.filter(C => !C.IsPlayer());
+	            }
 	            let index = -1;
 	            for (let CC = 0; CC < ChatRoomCharacter.length; CC++) {
 	                if (IsLilian(Player, ChatRoomCharacter[CC])) {
@@ -121,8 +128,6 @@
 	                    break;
 	                }
 	            }
-	            let drawList = ChatRoomCharacterDrawlist.slice();
-	            let impactList = ChatRoomImpactedBySenseDep.slice();
 	            ChatRoomCharacterDrawlist = [];
 	            ChatRoomImpactedBySenseDep = [];
 	            for (let CC = 0; CC < ChatRoomCharacter.length; CC++) {
@@ -139,6 +144,7 @@
 	                }
 	            }
 	            ChatRoomCharacterViewCharacterCount = ChatRoomCharacterDrawlist.length;
+	            ChatRoomCharacterViewCharacterCountTotal = ChatRoomCharacterViewCharacterCount;
 	        }
 	    });
 	}
