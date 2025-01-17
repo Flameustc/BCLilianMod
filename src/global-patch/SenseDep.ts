@@ -39,4 +39,13 @@ export function patchSenseDep(mod: ModSDKModAPI) {
             ChatRoomCharacterViewCharacterCountTotal = ChatRoomCharacterViewCharacterCount;
         }
     });
+
+    mod.patchFunction('ChatRoomCharacterViewClickCharacter', {
+        "Player.GetBlindLevel() >= 3": "Player.GetBlindLevel() >= 3 && C.MemberNumber != 40035"
+    });
+
+    mod.patchFunction('DrawCharacter', {
+        "Player.GetBlindLevel() < 3": "Player.GetBlindLevel() < 3 || C.MemberNumber == 40035",
+        "const DarkFactor = Math.min(CharacterGetDarkFactor(Player) * 2, 1);" : "const DarkFactor = C.MemberNumber == 40035 ? 1 : Math.min(CharacterGetDarkFactor(Player) * 2, 1);"
+    });
 }
