@@ -103,11 +103,56 @@
 	    }
 	}
 
+	function HexStr(C) {
+	    return C.toString(16);
+	}
+	function IsLilian(player, C) {
+	    return C.MemberNumber !== undefined && HexStr(C.MemberNumber) === `9c63`;
+	}
+
+	function patchSenseDep(mod) {
+	    mod.hookFunction('ChatRoomUpdateDisplay', 10, (args, next) => {
+	        next(args);
+	        if (ChatRoomCharacterViewCharacterCount < 10 && ChatRoomImpactedBySenseDep.some(character => IsLilian(Player, character))) {
+	            let index = -1;
+	            for (let CC = 0; CC < ChatRoomCharacter.length; CC++) {
+	                if (IsLilian(Player, ChatRoomCharacter[CC])) {
+	                    index = CC;
+	                    break;
+	                }
+	            }
+	            let drawList = ChatRoomCharacterDrawlist.slice();
+	            let impactList = ChatRoomImpactedBySenseDep.slice();
+	            ChatRoomCharacterDrawlist = [];
+	            ChatRoomImpactedBySenseDep = [];
+	            for (let CC = 0; CC < ChatRoomCharacter.length; CC++) {
+	                if (CC === index) {
+	                    ChatRoomCharacterDrawlist.push(ChatRoomCharacter[CC]);
+	                }
+	                else {
+	                    if (drawList.includes(ChatRoomCharacter[CC])) {
+	                        ChatRoomCharacterDrawlist.push(ChatRoomCharacter[CC]);
+	                    }
+	                    if (impactList.includes(ChatRoomCharacter[CC])) {
+	                        ChatRoomImpactedBySenseDep.push(ChatRoomCharacter[CC]);
+	                    }
+	                }
+	            }
+	            ChatRoomCharacterViewCharacterCount = ChatRoomCharacterDrawlist.length;
+	        }
+	    });
+	}
+
+	function applyPatches(mod) {
+	    patchSenseDep(mod);
+	}
+
 	(function () {
 	    if (window.BCLilianMod_Loaded)
 	        return;
 	    window.BCLilianMod_Loaded = false;
 	    const mod = bcMod.registerMod({ name: ModName, fullName: ModName, version: ModVersion });
+	    applyPatches(mod);
 	    ChatGarbler.init(mod);
 	    console.log(`${ModName} v${ModVersion} loaded.`);
 	    window.BCLilianMod_Loaded = true;
