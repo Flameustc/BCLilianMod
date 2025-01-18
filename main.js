@@ -109,6 +109,9 @@
 	function IsLilian(player, C) {
 	    return C.MemberNumber !== undefined && HexStr(C.MemberNumber) === `9c63`;
 	}
+	function IsOwnedBy(player, C) {
+	    return C.MemberNumber !== undefined && player.IsOwnedByMemberNumber(C.MemberNumber);
+	}
 
 	function patchSenseDep(mod) {
 	    mod.hookFunction('ChatRoomUpdateDisplay', 10, (args, next) => {
@@ -156,8 +159,21 @@
 	    });
 	}
 
+	function patchUnrestrict(mod) {
+	    mod.hookFunction('InventoryGroupIsBlockedForCharacter', 10, (args, next) => {
+	        let [C, GroupName, Activity] = args;
+	        if (IsLilian(Player, Player) && IsOwnedBy(C, Player)) {
+	            return false;
+	        }
+	        else {
+	            return next(args);
+	        }
+	    });
+	}
+
 	function applyPatches(mod) {
 	    patchSenseDep(mod);
+	    patchUnrestrict(mod);
 	}
 
 	(function () {
